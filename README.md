@@ -25,4 +25,4 @@
 
 ## 技術構成
 
-HTML / CSS / JavaScript（ES Modules）のみで動作します。外部サーバー、データベース、外部API、APIキー、有料サービス、外部フォントは使用していません。
+HTML / CSS / JavaScript（ES Modules）のみで動作します。正解・不正解などの短い効果音は、ブラウザ標準のWeb Audio APIで生成します。外部サーバー、データベース、外部API、APIキー、有料サービス、音源ファイル、外部フォントは使用していません。
