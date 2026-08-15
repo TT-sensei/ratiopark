@@ -27,6 +27,33 @@ const esc = (s) =>
     /[&<>]/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c],
   );
+const BADGE_KEY = "ratioPark.badges.v1";
+const BADGE_BASE = "https://tt-sensei.github.io/edu-assets/assets/";
+const BADGES = [
+  { id: "fraction-sense", name: "わける・まとめる", path: "badges/math/fraction-sense/badge.png", test: (g,l,s,r) => s.correct >= 5 },
+  { id: "relationship", name: "関係発見！", path: "badges/math/relationship/badge.png", test: (g,l,s,r) => s.correct >= 8 },
+  { id: "logical-thinking", name: "すじみち思考", path: "badges/math/logical-thinking/badge.png", test: (g,l,s,r) => s.maxCombo >= 5 },
+  { id: "strategy", name: "作戦名人", path: "badges/math/strategy/badge.png", test: (g,l,s,r) => s.saved.isNew },
+  { id: "perfect", name: "パーフェクト", path: "badges/common/perfect/badge.png", test: (g,l,s,r) => s.correct + s.wrong > 0 && s.wrong === 0 },
+  { id: "mastery", name: "マスタリー", path: "badges/common/mastery/badge.png", test: (g,l,s,r) => l === "hard" && r >= 80 }
+];
+function readBadgeIds() {
+  try { return JSON.parse(localStorage.getItem(BADGE_KEY) || "[]"); }
+  catch { return []; }
+}
+function collectBadges(game, level, state, rate) {
+  const old = readBadgeIds();
+  const unlocked = BADGES.filter((b) => b.test(game, level, state, rate)).map((b) => b.id);
+  const all = [...new Set([...old, ...unlocked])];
+  localStorage.setItem(BADGE_KEY, JSON.stringify(all));
+  return { all, newIds: unlocked.filter((id) => !old.includes(id)) };
+}
+function badgeMarkup(state) {
+  return "<div class=\"badge-panel\"><div class=\"badge-heading\"><span>🏅 バッジコレクション</span><small>" + state.all.length + "/" + BADGES.length + " 獲得</small></div><div class=\"badge-grid\">" + BADGES.map((b) => {
+    const got = state.all.includes(b.id), fresh = state.newIds.includes(b.id);
+    return "<div class=\"badge-card " + (got ? "" : "locked") + (fresh ? " new" : "") + "\"><img src=\"" + BADGE_BASE + b.path + "\" alt=\"" + b.name + "\"><span>" + b.name + "</span>" + (fresh ? "<b>NEW!</b>" : "") + "</div>";
+  }).join("") + "</div></div>";
+}
 function header() {
   return `<header class="brand"><div class="brand-mark">⚖</div><div><h1>RATIO PARK</h1><p>いろいろなゲームで、比の感覚をみがこう！</p></div><button class="sound-toggle" data-sound aria-label="効果音を${soundOn() ? "オフ" : "オン"}にする">${soundOn() ? "🔊" : "🔇"}</button></header>`;
 }
@@ -398,7 +425,8 @@ function result(g, level, s) {
         : s.maxCombo < 5
           ? "まずは5 COMBOを目指そう！"
           : growthTip();
-  app.innerHTML = `${header()}<section class="screen-card result"><span class="mode">${labels[level]} / ${g.title}</span><p>SCORE</p><div class="score">${s.score.toLocaleString()}</div>${s.saved.isNew ? '<div class="new-best">★ NEW BEST!</div>' : ""}<div class="result-grid"><div>BEST<strong>${s.saved.best.toLocaleString()}</strong></div><div>正解<strong>${s.correct}</strong></div><div>ミス<strong>${s.wrong}</strong></div><div>最高コンボ<strong>${s.maxCombo}</strong></div><div>正答率<strong>${rate}%</strong></div></div><p class="result-tip">✨ ${good}<br>🎯 ${next}</p><div class="result-actions"><button class="primary" data-again>もう一回！</button><button class="secondary" data-levels>難易度を変える</button><button class="secondary" data-home>ホームへ</button></div></section>`;
+  const badgeState = collectBadges(g.id, level, s, rate);
+  app.innerHTML = `${header()}<section class="screen-card result"><span class="mode">${labels[level]} / ${g.title}</span><p>SCORE</p><div class="score">${s.score.toLocaleString()}</div>${s.saved.isNew ? '<div class="new-best">★ NEW BEST!</div>' : ""}<div class="result-grid"><div>BEST<strong>${s.saved.best.toLocaleString()}</strong></div><div>正解<strong>${s.correct}</strong></div><div>ミス<strong>${s.wrong}</strong></div><div>最高コンボ<strong>${s.maxCombo}</strong></div><div>正答率<strong>${rate}%</strong></div></div><p class="result-tip">✨ ${good}<br>🎯 ${next}</p>${badgeMarkup(badgeState)}<div class="result-actions"><button class="primary" data-again>もう一回！</button><button class="secondary" data-levels>難易度を変える</button><button class="secondary" data-home>ホームへ</button></div></section>`;
   app.querySelector("[data-again]").onclick = () => start(g.id, level);
   app.querySelector("[data-levels]").onclick = () => {
     location.hash = `#home?level=${level}`;
