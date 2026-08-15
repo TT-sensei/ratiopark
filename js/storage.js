@@ -75,4 +75,5 @@ export const growthTip = () => {
 };
 export const reset = () => {
   localStorage.removeItem(KEY);
+  localStorage.removeItem("ratioPark.badges.v1");
 };
