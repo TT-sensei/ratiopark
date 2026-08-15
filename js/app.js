@@ -82,7 +82,7 @@ function home() {
     )
     .join(
       "",
-    )}</div><small>🎟 ${data.plays || 0}回プレイ　✨最高 ${data.maxCombo || 0} COMBO</small></section><div class="section-title"><h2>🎡 アトラクションをえらぼう</h2><span class="mode">${labels[level]}</span></div><section class="game-grid">${games.map((g, i) => `<button class="game-card" data-game="${g.id}"><div class="card-top"><div class="game-icon">${icons[i]}</div><div><small>GAME ${String(i + 1).padStart(2, "0")}</small><h3>${g.title}</h3></div></div><p>${words[i]}</p><div class="best-line">BEST SCORE <strong>${best(g.id, level).toLocaleString()}</strong></div></button>`).join("")}</section><details class="ratio-secret"><summary>💡 比のひみつ</summary><p>両方に同じ数をかけても、わっても、比は同じ。比の値は「前の数 ÷ 後ろの数」。</p></details><button class="reset-link" data-reset>記録をリセット</button>`;
+    )}</div><small>🎟 ${data.plays || 0}回プレイ　✨最高 ${data.maxCombo || 0} COMBO</small></section><div class="section-title"><h2>🎡 アトラクションをえらぼう</h2><span class="mode">${labels[level]}</span></div><section class="game-grid">${games.map((g, i) => `<button class="game-card" data-game="${g.id}"><div class="card-top"><div class="game-icon">${icons[i]}</div><div><small>GAME ${String(i + 1).padStart(2, "0")}</small><h3>${g.title}</h3></div></div><p>${words[i]}</p><div class="best-line">BEST SCORE <strong>${best(g.id, level).toLocaleString()}</strong></div></button>`).join("")}</section><details class="ratio-secret"><summary>💡 比のひみつ</summary><p>両方に同じ数をかけても、わっても、比は同じ。比の値は「前の数 ÷ 後ろの数」。</p></details>${badgeMarkup({ all: readBadgeIds(), newIds: [] })}<button class="reset-link" data-reset>記録をリセット</button>`;
   app.querySelector("[data-sound]").onclick = () => {
     toggleSound();
     unlockAudio();
