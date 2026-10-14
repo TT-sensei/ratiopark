@@ -254,13 +254,8 @@ function start(id, level) {
         helperCharacter = event.near ? "kai" : event.ok ? "tsuki" : "nami";
         helperPose = event.near ? "hint" : event.ok ? "correct" : "retry";
         feedbackTip = event.near || event.ok ? gameHint(id, q) : `${gameHint(id, q)} ${gameSolution(id, q)}`;
-        const answeredQuestion = q;
-        setTimeout(() => {
-          if (q !== answeredQuestion) return;
-          feedback = "";
-          feedbackTip = "";
-          if (engine.active && !engine.locked) render();
-        }, 900);
+        // Keep answer feedback visible until the learner answers again or the question changes.
+        // Wrong answers stay on the same question, so the explanation remains available while thinking.
       }
       render();
     },
