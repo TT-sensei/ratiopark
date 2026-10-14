@@ -352,6 +352,7 @@ function start(id, level) {
         (b) =>
           (b.onclick = () => {
             q.active = b.dataset.field;
+            render();
           }),
       );
       app.querySelectorAll("[data-key]").forEach(
