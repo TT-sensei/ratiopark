@@ -506,6 +506,7 @@ function result(g, level, s) {
           : growthTip();
   const badgeState = collectBadges(g.id, level, s, rate);
   app.innerHTML = `${header()}<section class="screen-card result"><span class="mode">${labels[level]} / ${g.title}</span><p>SCORE</p><div class="score">${s.score.toLocaleString()}</div>${s.saved.isNew ? '<div class="new-best">★ NEW BEST!</div>' : ""}<div class="result-grid"><div>BEST<strong>${s.saved.best.toLocaleString()}</strong></div><div>正解<strong>${s.correct}</strong></div><div>ミス<strong>${s.wrong}</strong></div><div>最高コンボ<strong>${s.maxCombo}</strong></div><div>正答率<strong>${rate}%</strong></div></div><p class="result-tip">✨ ${good}<br>🎯 ${next}</p>${badgeMarkup(badgeState)}<div class="result-actions"><button class="primary" data-again>もう一回！</button><button class="secondary" data-levels>難易度を変える</button><button class="secondary" data-home>ホームへ</button></div></section>`;
+  bindSoundToggle();
   app.querySelector("[data-again]").onclick = () => start(g.id, level);
   app.querySelector("[data-levels]").onclick = () => {
     location.hash = `#home?level=${level}`;
