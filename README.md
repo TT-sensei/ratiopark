@@ -30,7 +30,7 @@
 
 ## 起動・公開
 
-HTML / CSS / JavaScript（ES Modules）の静的Webアプリです。GitHub Pagesで公開できます。npm、ビルド、データベース、外部API、APIキー、有料サービス、外部フォントは使用していません。キャラクター画像はTT-senseiのナビキャラクターWebP素材を参照しています。
+HTML / CSS / JavaScript（ES Modules）の静的Webアプリです。GitHub Pagesで公開できます。npmやビルド、データベース、外部API、APIキー、有料サービス、外部フォントは使用していません。ナビキャラクターと既存バッジは、公開済みのTT-sensei素材URLを参照しています。
 
 ## 保存データ
 
