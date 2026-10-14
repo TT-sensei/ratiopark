@@ -32,7 +32,7 @@ export const ratioValueGame = {
   title: "比の値ハンター",
   newQuestion(level) {
     const pair = sets[level][rand(0, sets[level].length - 1)];
-    return { pair, active: "n", n: "", d: "" };
+    return { pair, active: "d", n: "", d: "" };
   },
   render(q) {
     const [a, b] = q.pair;
