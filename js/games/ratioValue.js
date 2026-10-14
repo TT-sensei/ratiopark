@@ -36,7 +36,7 @@ export const ratioValueGame = {
   },
   render(q) {
     const [a, b] = q.pair;
-    return `<div class="question-area"><p class="prompt">${formatRatio(a, b)} の比の値は？ <small>（前の数 ÷ 後ろの数）</small></p><div class="ratio-big">${formatRatio(a, b)}</div><div class="fraction-input vertical"><button class="fraction-box" data-field="n">${q.n || "□"}</button><span class="fraction-bar"></span><button class="fraction-box" data-field="d">${q.d || "□"}</button></div><div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "✓"].map((k) => `<button class="${k === "✓" ? "enter" : k === "C" ? "clear" : ""}" data-key="${k}">${k}</button>`).join("")}</div></div>`;
+    return `<div class="question-area"><p class="prompt">${formatRatio(a, b)} の比の値は？ <small>（前の数 ÷ 後ろの数）</small></p><div class="ratio-big">${formatRatio(a, b)}</div><div class="fraction-input vertical"><button class="fraction-box ${q.active === "n" ? "active" : ""}" data-field="n" aria-label="分子を入力">${q.n || "□"}</button><span class="fraction-bar"></span><button class="fraction-box ${q.active === "d" ? "active" : ""}" data-field="d" aria-label="分母を入力">${q.d || "□"}</button></div><div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "✓"].map((k) => `<button class="${k === "✓" ? "enter" : k === "C" ? "clear" : ""}" data-key="${k}">${k}</button>`).join("")}</div></div>`;
   },
   judge(q) {
     const n = Number(q.n),
