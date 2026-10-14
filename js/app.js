@@ -54,6 +54,19 @@ function gameHint(id, q) {
       return "2つの数量の関係を図や式で考えてみよう。";
   }
 }
+function gameProgress(id, q) {
+  switch (id) {
+    case "sameRatio": return "4つから選ぶ";
+    case "simplifyRatio": return q.level === "hard" && !q.integerized ? "まず整数の比にする" : "ステップ " + (q.steps + 1);
+    case "ratioValue": return "分数で答える";
+    case "memoryRatio": return (q.cards.filter((c) => c.state === "matched").length / 2) + "/" + (q.cards.length / 2) + " ペア";
+    case "fakeRatio": return "ニセモノは1つ";
+    case "missingRatio": return "□の数を入力";
+    case "compareRatio": return "＜・＝・＞を選ぶ";
+    case "ratioChain": return Math.min(q.step + 1, 5) + "/5 CHAIN";
+    default: return "正確さも大切";
+  }
+}
 function gameSolution(id, q) {
   switch (id) {
     case "sameRatio": {
@@ -132,16 +145,15 @@ function home() {
     data = read(),
     icons = ["◎", "÷", "½", "🂠", "🕵", "□", "＜", "⛓"],
     words = [
-      "同じ比をタッチ！",
-      "比を小さくしよう！",
-      "比の値を分数で！",
-      "ペアを集めよう！",
-      "ニセモノを見抜け！",
-      "□を見つけよう！",
-      "比の値をくらべよう！",
-      "同じ比をつなごう！",
-    ];
-  app.innerHTML = `${header()}<section class="hero"><h2>比のアトラクションへ、ようこそ。</h2><p>見て、考えて、タップ！ 正確に続けるほどコンボで得点アップ。</p><div class="difficulty">${Object.entries(
+      "前と後ろを同じ数倍にした比を見つける",
+      "2つの数を同じ数で割って簡単にする",
+      "前の数 ÷ 後ろの数を分数で表す",
+      "見た目が違っても等しい比をペアにする",
+      "2つの数の倍率が違う比を見抜く",
+      "等しい比の□に入る数を求める",
+      "比の値を計算して大きさを比べる",
+      "等しい比を5回つないでいく",
+    ];  app.innerHTML = `${header()}<section class="hero"><h2>比のアトラクションへ、ようこそ。</h2><p>見て、考えて、タップ！ 正確に続けるほどコンボで得点アップ。</p><div class="difficulty">${Object.entries(
     labels,
   )
     .map(
@@ -257,7 +269,7 @@ function start(id, level) {
   activeEngine = engine;
   function render() {
     if (!engine.active && engine.time > 0) return;
-    app.innerHTML = `${header()}<section class="screen-card">${gameHead(g, level, engine)}<div class="game-time-track" aria-label="残り時間"><i style="width:${Math.max(0, engine.time / 60 * 100)}%"></i></div><div class="game-skill-line"><span>${({sameRatio:"等しい比を見つける",simplifyRatio:"比を簡単にする",ratioValue:"比の値を求める",memoryRatio:"等しい比を見抜く",fakeRatio:"まちがいを見抜く",missingRatio:"未知の数を求める",compareRatio:"比の値を比べる",ratioChain:"等しい比をつなぐ"})[id]}</span><span>正確さも大切</span></div><div class="feedback ${feedback.startsWith("○") ? "good" : feedback.startsWith("×") ? "bad" : feedback ? "near" : ""}" role="status" aria-live="polite">${feedback}</div>${feedback ? `<div class="navi-reaction">${naviImage(helperCharacter, helperPose)}<p>${esc(feedbackTip)}</p></div>` : ""}${g.render(q)}<div class="game-help"><button class="text-button" data-help>${showHelp ? "考え方をとじる" : "💡 考え方を見てみる"}</button>${showHelp ? `<div class="game-help-panel">${naviImage("kai", "hint")}<p>${esc(gameHint(id, q))}</p></div>` : ""}</div></section>`;
+    app.innerHTML = `${header()}<section class="screen-card">${gameHead(g, level, engine)}<div class="game-time-track" aria-label="残り時間"><i style="width:${Math.max(0, engine.time / 60 * 100)}%"></i></div><div class="game-skill-line"><span>${({sameRatio:"等しい比を見つける",simplifyRatio:"比を簡単にする",ratioValue:"比の値を求める",memoryRatio:"等しい比を見抜く",fakeRatio:"まちがいを見抜く",missingRatio:"未知の数を求める",compareRatio:"比の値を比べる",ratioChain:"等しい比をつなぐ"})[id]}</span><span>${gameProgress(id, q)}</span></div><div class="feedback ${feedback.startsWith("○") ? "good" : feedback.startsWith("×") ? "bad" : feedback ? "near" : ""}" role="status" aria-live="polite">${feedback}</div>${feedback ? `<div class="navi-reaction">${naviImage(helperCharacter, helperPose)}<p>${esc(feedbackTip)}</p></div>` : ""}${g.render(q)}<div class="game-help"><button class="text-button" data-help>${showHelp ? "考え方をとじる" : "💡 考え方を見てみる"}</button>${showHelp ? `<div class="game-help-panel">${naviImage("kai", "hint")}<p>${esc(gameHint(id, q))}</p></div>` : ""}</div></section>`;
     if (answerMarks) {
       const chosen = app.querySelector(`[${answerMarks.selector}="${answerMarks.value}"]`);
       if (chosen) chosen.classList.add(answerMarks.ok ? "correct" : "wrong");
