@@ -145,7 +145,7 @@ export function mountRatioLab({
       <section class="ratio-lab-panel">
         <div class="ratio-lab-panel-head">
           <div><p class="eyebrow">TRY IT / 02</p><h2>等しい比をつくろう</h2></div>
-          ${navi("sora", "thinking")}
+          ${navi("sora", "hint")}
         </div>
         <p class="ratio-lab-lead">2：3をもとに、数を変えてみよう。2つの数をどのように変えると、比は変わらないかな？</p>
         <div class="ratio-builder-controls">
