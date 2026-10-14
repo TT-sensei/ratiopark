@@ -9,7 +9,12 @@ import { fakeRatioGame } from "./games/fakeRatio.js";
 import { missingRatioGame } from "./games/missingRatio.js";
 import { compareRatioGame } from "./games/compareRatio.js";
 import { ratioChainGame } from "./games/ratioChain.js";
+import { mountRatioLab } from "./ratioLab.js";
 const app = document.querySelector("#app");
+const NAVI_BASE = "https://tt-sensei.github.io/navi-character-/assets/web/characters";
+function naviImage(id, pose, className = "navi-reaction-image") {
+  return `<img class="${className}" src="${NAVI_BASE}/${id}/fullbody/${pose}.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="this.hidden=true">`;
+}
 const games = [
   sameRatioGame,
   simplifyRatioGame,
@@ -27,6 +32,38 @@ const esc = (s) =>
     /[&<>]/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c],
   );
+function gameHint(id, q) {
+  switch (id) {
+    case "sameRatio":
+      return `お題は ${q.shown[0]}：${q.shown[1]}。前の数を何倍かしたなら、後ろの数も同じ倍率になっているかを見よう。`;
+    case "simplifyRatio":
+      return `今の比は ${q.current.join("：")}。2つの数を同じ数で割っても、比は変わらないよ。小数なら先に両方を10倍して整数にしよう。`;
+    case "ratioValue":
+      return `比の値は「前の数 ÷ 後ろの数」。${q.pair[0]}：${q.pair[1]}なら、${q.pair[0]}/${q.pair[1]} と分数にして、約分できるか確かめよう。`;
+    case "memoryRatio":
+      return "2枚の比をそれぞれ簡単にして、同じ数の組になるか見くらべよう。";
+    case "fakeRatio":
+      return `お題は ${q.base[0]}：${q.base[1]}。前の数だけでなく、後ろの数も同じ倍率になっているか確かめよう。`;
+    case "missingRatio":
+      return "□の左右にある比を見くらべよう。対応する数どうしが同じ数倍になっているかが手がかりだよ。";
+    case "compareRatio":
+      return `左は ${q.a[0]}÷${q.a[1]}、右は ${q.b[0]}÷${q.b[1]}。比の値を分数で表して大きさを比べよう。`;
+    case "ratioChain":
+      return `もとの比は ${q.base[0]}：${q.base[1]}。2つの数に同じ数をかけたり、わったりして、次の比をつなごう。`;
+    default:
+      return "2つの数量の関係を図や式で考えてみよう。";
+  }
+}
+function bindSoundToggle() {
+  const button = app.querySelector("[data-sound]");
+  if (!button) return;
+  button.onclick = () => {
+    toggleSound();
+    unlockAudio();
+    button.textContent = soundOn() ? "🔊" : "🔇";
+    button.setAttribute("aria-label", `効果音を${soundOn() ? "オフ" : "オン"}にする`);
+  };
+}
 const BADGE_KEY = "ratioPark.badges.v1";
 const BADGE_BASE = "https://tt-sensei.github.io/edu-assets/assets/";
 const BADGES = [
@@ -82,12 +119,8 @@ function home() {
     )
     .join(
       "",
-    )}</div><small>🎟 ${data.plays || 0}回プレイ　✨最高 ${data.maxCombo || 0} COMBO</small></section><div class="section-title"><h2>🎡 アトラクションをえらぼう</h2><span class="mode">${labels[level]}</span></div><section class="game-grid">${games.map((g, i) => `<button class="game-card" data-game="${g.id}"><div class="card-top"><div class="game-icon">${icons[i]}</div><div><small>GAME ${String(i + 1).padStart(2, "0")}</small><h3>${g.title}</h3></div></div><p>${words[i]}</p><div class="best-line">BEST SCORE <strong>${best(g.id, level).toLocaleString()}</strong></div></button>`).join("")}</section><details class="ratio-secret"><summary>💡 比のひみつ</summary><p>両方に同じ数をかけても、わっても、比は同じ。比の値は「前の数 ÷ 後ろの数」。</p></details>${badgeMarkup({ all: readBadgeIds(), newIds: [] })}<button class="reset-link" data-reset>記録をリセット</button>`;
-  app.querySelector("[data-sound]").onclick = () => {
-    toggleSound();
-    unlockAudio();
-    home();
-  };
+    )}</div><small>🎟 ${data.plays || 0}回プレイ　✨最高 ${data.maxCombo || 0} COMBO</small></section><section class="lab-launch"><div class="lab-launch-copy">${naviImage("kai", "hint", "lab-launch-navi")}<div><p class="eyebrow">START HERE</p><h2>比ラボで、数を動かしてみよう</h2><p>同じ比・比の値・比で分ける問題を、目で見ながらためせるよ。</p></div></div><button class="lab-launch-button" data-lab>比ラボをひらく <span aria-hidden="true">→</span></button></section><div class="section-title"><h2>🎡 アトラクションをえらぼう</h2><span class="mode">${labels[level]}</span></div><section class="game-grid">${games.map((g, i) => `<button class="game-card" data-game="${g.id}"><div class="card-top"><div class="game-icon">${icons[i]}</div><div><small>GAME ${String(i + 1).padStart(2, "0")}</small><h3>${g.title}</h3></div></div><p>${words[i]}</p><div class="best-line">BEST SCORE <strong>${best(g.id, level).toLocaleString()}</strong></div></button>`).join("")}</section><details class="ratio-secret"><summary>💡 比のひみつ</summary><p>両方に同じ数をかけても、わっても、比は同じ。比の値は「前の数 ÷ 後ろの数」。</p></details>${badgeMarkup({ all: readBadgeIds(), newIds: [] })}<button class="reset-link" data-reset>記録をリセット</button>`;
+  bindSoundToggle();
   app.querySelectorAll("[data-level]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -102,6 +135,10 @@ function home() {
         start(b.dataset.game, level);
       }),
   );
+  app.querySelector("[data-lab]").onclick = () => {
+    unlockAudio();
+    startRatioLab(level);
+  };
   app.querySelector("[data-reset]").onclick = () => {
     if (confirm("すべての記録を消しますか？")) {
       reset();
@@ -109,13 +146,35 @@ function home() {
     }
   };
 }
+function startRatioLab(level) {
+  activeEngine?.stop();
+  activeEngine = null;
+  mountRatioLab({
+    app,
+    header,
+    level,
+    onHome: () => {
+      location.hash = "#home";
+      home();
+    },
+    onPractice: () => start("sameRatio", level),
+    onSoundToggle: () => {
+      toggleSound();
+      unlockAudio();
+    },
+  });
+}
 function gameHead(g, level, e) {
   return `<button class="back" data-home>← パークにもどる</button><div class="game-head"><div><span class="mode">${labels[level]}</span><h2>${g.title}</h2></div><div class="stats"><div class="stat">TIME<strong>${e.time}</strong></div><div class="stat">SCORE<strong>${e.score}</strong></div><div class="stat">COMBO<strong>${e.combo}</strong></div></div></div>`;
 }
 function start(id, level) {
   const g = games.find((x) => x.id === id);
   let q = g.newQuestion(level),
-    feedback = "";
+    feedback = "",
+    feedbackTip = "",
+    helperCharacter = "kai",
+    helperPose = "hint",
+    showHelp = false;
   const engine = new GameEngine({
     game: id,
     level,
@@ -123,6 +182,7 @@ function start(id, level) {
       if (event.phase === "countdown") {
         sounds.count(event.word);
         app.innerHTML = `${header()}<section class="screen-card countdown">${event.word}<span>まもなくスタート！</span></section>`;
+        bindSoundToggle();
         return;
       }
       if (event.phase === "tick") {
@@ -145,7 +205,16 @@ function start(id, level) {
           : event.ok
             ? "○ GOOD!"
             : "× もう一度考えよう";
-        setTimeout(() => (feedback = ""), 900);
+        helperCharacter = event.near ? "kai" : event.ok ? "tsuki" : "nami";
+        helperPose = event.near ? "hint" : event.ok ? "correct" : "retry";
+        feedbackTip = gameHint(id, q);
+        const answeredQuestion = q;
+        setTimeout(() => {
+          if (q !== answeredQuestion) return;
+          feedback = "";
+          feedbackTip = "";
+          if (engine.active && !engine.locked) render();
+        }, 900);
       }
       render();
     },
@@ -154,20 +223,30 @@ function start(id, level) {
   activeEngine = engine;
   function render() {
     if (!engine.active && engine.time > 0) return;
-    app.innerHTML = `${header()}<section class="screen-card">${gameHead(g, level, engine)}<div class="feedback ${feedback.startsWith("○") ? "good" : feedback.startsWith("×") ? "bad" : feedback ? "near" : ""}">${feedback}</div>${g.render(q)}</section>`;
+    app.innerHTML = `${header()}<section class="screen-card">${gameHead(g, level, engine)}<div class="feedback ${feedback.startsWith("○") ? "good" : feedback.startsWith("×") ? "bad" : feedback ? "near" : ""}">${feedback}</div>${feedback ? `<div class="navi-reaction">${naviImage(helperCharacter, helperPose)}<p>${esc(feedbackTip)}</p></div>` : ""}${g.render(q)}<div class="game-help"><button class="text-button" data-help>${showHelp ? "考え方をとじる" : "💡 考え方を見てみる"}</button>${showHelp ? `<div class="game-help-panel">${naviImage("kai", "hint")}<p>${esc(gameHint(id, q))}</p></div>` : ""}</div></section>`;
     app.querySelector("[data-home]").onclick = () => {
       engine.stop();
       location.hash = "#home";
       home();
     };
+    bindSoundToggle();
     bind();
   }
   function next() {
     q = g.newQuestion(level);
+    feedback = "";
+    feedbackTip = "";
+    showHelp = false;
+    helperCharacter = "kai";
+    helperPose = "hint";
     engine.unlock();
     render();
   }
   function bind() {
+    app.querySelector("[data-help]")?.addEventListener("click", () => {
+      showHelp = !showHelp;
+      render();
+    });
     if (id === "sameRatio")
       app.querySelectorAll("[data-choice]").forEach(
         (b) =>
