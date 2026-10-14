@@ -174,7 +174,8 @@ function start(id, level) {
     feedbackTip = "",
     helperCharacter = "kai",
     helperPose = "hint",
-    showHelp = false;
+    showHelp = false,
+    answerMarks = null;
   const engine = new GameEngine({
     game: id,
     level,
@@ -189,6 +190,8 @@ function start(id, level) {
         const stats = app.querySelectorAll(".stat strong");
         if (stats.length >= 3) {
           stats[0].textContent = engine.time;
+          const track = app.querySelector(".game-time-track i");
+          if (track) track.style.width = `${Math.max(0, engine.time / 60 * 100)}%`;
           stats[1].textContent = engine.score;
           stats[2].textContent = engine.combo;
         }
@@ -223,7 +226,15 @@ function start(id, level) {
   activeEngine = engine;
   function render() {
     if (!engine.active && engine.time > 0) return;
-    app.innerHTML = `${header()}<section class="screen-card">${gameHead(g, level, engine)}<div class="feedback ${feedback.startsWith("○") ? "good" : feedback.startsWith("×") ? "bad" : feedback ? "near" : ""}">${feedback}</div>${feedback ? `<div class="navi-reaction">${naviImage(helperCharacter, helperPose)}<p>${esc(feedbackTip)}</p></div>` : ""}${g.render(q)}<div class="game-help"><button class="text-button" data-help>${showHelp ? "考え方をとじる" : "💡 考え方を見てみる"}</button>${showHelp ? `<div class="game-help-panel">${naviImage("kai", "hint")}<p>${esc(gameHint(id, q))}</p></div>` : ""}</div></section>`;
+    app.innerHTML = `${header()}<section class="screen-card">${gameHead(g, level, engine)}<div class="game-time-track" aria-label="残り時間"><i style="width:${Math.max(0, engine.time / 60 * 100)}%"></i></div><div class="game-skill-line"><span>${({sameRatio:"等しい比を見つける",simplifyRatio:"比を簡単にする",ratioValue:"比の値を求める",memoryRatio:"等しい比を見抜く",fakeRatio:"まちがいを見抜く",missingRatio:"未知の数を求める",compareRatio:"比の値を比べる",ratioChain:"等しい比をつなぐ"})[id]}</span><span>正確さも大切</span></div><div class="feedback ${feedback.startsWith("○") ? "good" : feedback.startsWith("×") ? "bad" : feedback ? "near" : ""}">${feedback}</div>${feedback ? `<div class="navi-reaction">${naviImage(helperCharacter, helperPose)}<p>${esc(feedbackTip)}</p></div>` : ""}${g.render(q)}<div class="game-help"><button class="text-button" data-help>${showHelp ? "考え方をとじる" : "💡 考え方を見てみる"}</button>${showHelp ? `<div class="game-help-panel">${naviImage("kai", "hint")}<p>${esc(gameHint(id, q))}</p></div>` : ""}</div></section>`;
+    if (answerMarks) {
+      const chosen = app.querySelector(`[${answerMarks.selector}="${answerMarks.value}"]`);
+      if (chosen) chosen.classList.add(answerMarks.ok ? "correct" : "wrong");
+      if (!answerMarks.ok && answerMarks.correctValue !== undefined) {
+        const correct = app.querySelector(`[${answerMarks.selector}="${answerMarks.correctValue}"]`);
+        if (correct) correct.classList.add("correct");
+      }
+    }
     app.querySelector("[data-home]").onclick = () => {
       engine.stop();
       location.hash = "#home";
@@ -236,6 +247,7 @@ function start(id, level) {
     q = g.newQuestion(level);
     feedback = "";
     feedbackTip = "";
+    answerMarks = null;
     showHelp = false;
     helperCharacter = "kai";
     helperPose = "hint";
@@ -251,8 +263,10 @@ function start(id, level) {
       app.querySelectorAll("[data-choice]").forEach(
         (b) =>
           (b.onclick = () => {
-            const choice = q.choices[Number(b.dataset.choice)];
-            if (!engine.answer(choice.ok, { weakness: "sameRatio" })) return;
+            const index = Number(b.dataset.choice);
+            const choice = q.choices[index];
+            answerMarks = { selector: "data-choice", value: String(index), ok: choice.ok, correctValue: String(q.choices.findIndex(x => x.ok)) };
+            if (!engine.answer(choice.ok, { weakness: "sameRatio" })) { answerMarks = null; return; }
             b.classList.add(choice.ok ? "correct" : "wrong");
             if (choice.ok) {
               setTimeout(next, 260);
@@ -382,7 +396,9 @@ function start(id, level) {
       app.querySelectorAll("[data-choice]").forEach(
         (b) =>
           (b.onclick = () => {
-            const c = q.cards[Number(b.dataset.choice)];
+            const index = Number(b.dataset.choice);
+            const c = q.cards[index];
+            answerMarks = { selector: "data-choice", value: String(index), ok: c.fake, correctValue: String(q.cards.findIndex(x => x.fake)) };
             if (
               !engine.answer(c.fake, {
                 weakness: "fakeRatio",
@@ -439,6 +455,7 @@ function start(id, level) {
         (b) =>
           (b.onclick = () => {
             const ok = Number(b.dataset.compare) === q.answer;
+            answerMarks = { selector: "data-compare", value: String(b.dataset.compare), ok, correctValue: String(q.answer) };
             if (
               !engine.answer(ok, {
                 weakness: "compareRatio",
@@ -460,7 +477,9 @@ function start(id, level) {
       app.querySelectorAll("[data-chain]").forEach(
         (b) =>
           (b.onclick = () => {
-            const c = q.options[Number(b.dataset.chain)];
+            const index = Number(b.dataset.chain);
+            const c = q.options[index];
+            answerMarks = { selector: "data-chain", value: String(index), ok: c.ok, correctValue: String(q.options.findIndex(x => x.ok)) };
             if (
               !engine.answer(c.ok, {
                 weakness: "ratioChain",
