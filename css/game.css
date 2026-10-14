@@ -130,3 +130,21 @@
 @media(max-width:650px){.ratio-lab-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.ratio-adjust-grid{gap:8px}.ratio-adjust-card{padding:10px}.ratio-equation-board{gap:8px;padding:12px}.ratio-toggle-group{width:100%}.ratio-toggle-group button{flex:1}.ratio-lab-bottom,.ratio-lab-footer{align-items:flex-start;flex-direction:column}.mission-choices{grid-template-columns:repeat(2,minmax(0,1fr))}.mission-parts{align-items:flex-start;flex-direction:column;gap:7px}.mission-ratio-card{gap:10px}.ratio-mini-lesson{align-items:flex-start;flex-direction:column}.ratio-mini-lesson .secondary{width:100%}.ratio-value-expression span:last-child{margin-left:0}}
 @media(max-width:400px){.ratio-lab-panel-head .ratio-navi{width:40px}.ratio-adjust-controls button{min-width:40px}.ratio-reference{gap:7px;padding:10px}.ratio-lab-panel{padding:13px}.ratio-value-picks button{padding:8px 10px}}
 
+
+
+/* GAME PLAY QUALITY PASS */
+.game-time-track{height:6px;width:100%;margin:0 0 10px;border-radius:20px;background:#e8edf4;overflow:hidden}
+.game-time-track i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#2e8c9a,#5265c6);transition:width .25s linear}
+.game-skill-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;padding:8px 11px;border:1px solid #e3eaf2;border-radius:11px;background:#f7f9fc;color:#40546d;font-size:.78rem;font-weight:750}
+.game-skill-line span:last-child{color:#74849a;font-size:.72rem;font-weight:600}
+.operator.correct{background:#dff8ea;border-color:var(--good);color:#176c4f}
+.operator.wrong{background:#ffe5e9;border-color:var(--bad);color:#a32e43}
+.fraction-box.active{border-color:#4058b6;background:#f0f3ff;box-shadow:0 0 0 3px #4058b61c}
+.choice:active,.operator:active,.memory-card:active,.keypad button:active{transform:scale(.98)}
+.question-area .prompt{font-weight:750;line-height:1.55}
+.question-area .hint{line-height:1.55}
+.choice,.operator,.fraction-box,.keypad button,.memory-card{touch-action:manipulation}
+.game-help-panel{animation:gameHintIn .16s ease-out}
+@keyframes gameHintIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:650px){.game-skill-line{padding:7px 9px}.game-time-track{margin-bottom:7px}.choice{min-height:66px}.operator{min-height:60px}.fraction-box{min-height:56px}}
+@media(prefers-reduced-motion:reduce){.game-help-panel{animation:none}.game-time-track i{transition:none}.choice,.operator,.memory-card,.keypad button{transition:none}}
