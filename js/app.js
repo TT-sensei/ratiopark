@@ -54,6 +54,37 @@ function gameHint(id, q) {
       return "2つの数量の関係を図や式で考えてみよう。";
   }
 }
+function gameSolution(id, q) {
+  switch (id) {
+    case "sameRatio": {
+      const answer = q.choices.find((x) => x.ok)?.pair;
+      return answer ? `正解は ${answer[0]}：${answer[1]}。前と後ろを同じ倍率にするのがポイント。` : "前と後ろを同じ倍率にしよう。";
+    }
+    case "simplifyRatio": {
+      const op = q.options.find((x) => x.ok);
+      if (!op) return "2つの数を同じ数で割れるか探そう。";
+      return op.n === "×10" ? "小数の比は、まず両方を10倍して整数にしよう。" : `次は両方を÷${op.n}。片方だけを割らないようにしよう。`;
+    }
+    case "ratioValue":
+      return `比の値は ${q.pair[0]}÷${q.pair[1]}。分数にして、できるだけ約分しよう。`;
+    case "memoryRatio":
+      return "2枚の比をそれぞれ簡単にして、同じ組になるか確かめよう。";
+    case "fakeRatio": {
+      const answer = q.cards.find((x) => x.fake)?.pair;
+      return answer ? `ニセモノは ${answer[0]}：${answer[1]}。2つの数が同じ倍率になっていないよ。` : "2つの数が同じ倍率になっているか見よう。";
+    }
+    case "missingRatio":
+      return `□に入る数は ${q.answer}。対応する数どうしが同じ倍率になっているか確かめよう。`;
+    case "compareRatio":
+      return `比の値を比べると、左 ${q.a[0]}÷${q.a[1]}、右 ${q.b[0]}÷${q.b[1]}。${q.answer < 0 ? "左が小さい" : q.answer > 0 ? "左が大きい" : "2つは等しい"}よ。`;
+    case "ratioChain": {
+      const answer = q.options.find((x) => x.ok)?.pair;
+      return answer ? `次につながる比は ${answer[0]}：${answer[1]}。2つに同じ数をかけよう。` : "前と後ろに同じ数をかけよう。";
+    }
+    default:
+      return "比の前と後ろの数を、同じ倍率で考えよう。";
+  }
+}
 function bindSoundToggle() {
   const button = app.querySelector("[data-sound]");
   if (!button) return;
@@ -210,7 +241,7 @@ function start(id, level) {
             : "× もう一度考えよう";
         helperCharacter = event.near ? "kai" : event.ok ? "tsuki" : "nami";
         helperPose = event.near ? "hint" : event.ok ? "correct" : "retry";
-        feedbackTip = gameHint(id, q);
+        feedbackTip = event.near || event.ok ? gameHint(id, q) : `${gameHint(id, q)} ${gameSolution(id, q)}`;
         const answeredQuestion = q;
         setTimeout(() => {
           if (q !== answeredQuestion) return;
